@@ -1,3 +1,5 @@
-schrodinger_uwu/potential.out
-schrodinger_uwu/psi_mat.out
-schrodinger_uwu/x_coords.out
+schrodinger_uwu/psiI_mat.npy
+schrodinger_uwu/psiR_mat.npy
+
+schrodinger_uwu/potential.npy
+schrodinger_uwu/x_coords.npy
