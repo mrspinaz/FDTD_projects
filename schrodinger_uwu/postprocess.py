@@ -11,12 +11,14 @@ line1, = axis.plot([], [])
 line2, = axis.plot([], [])
 line3, = axis.plot([], [])
 
-
+print('test here')
 
 psiR_mat = np.load('schrodinger_uwu/psiR_mat.npy')
 psiI_mat = np.load('schrodinger_uwu/psiI_mat.npy')
 V = np.load('schrodinger_uwu/potential.npy')
 x = np.load('schrodinger_uwu/x_coords.npy')
+
+print('test after load')
 
 def init():
     line1.set_data([], [])
@@ -33,9 +35,10 @@ def animate(i):
     line3.set_data(x,y2)
     return line1, line2, line3,
 
-anim = FuncAnimation(fig, animate, init_func=init, frames=1000, interval=1, blit=True)
+anim = FuncAnimation(fig, animate, init_func=init, frames=900, interval=1, blit=True)
 plt.show()
-writer = PillowWriter(fps=30)
-anim.save('schrodinger_uwu/test.gif', writer = writer)
+
+#writer = PillowWriter(fps=30)
+#anim.save('schrodinger_uwu/test.gif', writer = writer)
 
 
