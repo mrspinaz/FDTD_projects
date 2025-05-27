@@ -5,12 +5,14 @@ import numpy as np
 fig=plt.figure()
 
 axis = plt.axes(xlim =(0, 1), 
-                ylim =(-10, 20))
+                ylim =(-10, 15))
 
-line1, = axis.plot([], [])
-line2, = axis.plot([], [])
-line3, = axis.plot([], [])
-line4, = axis.plot([], [])
+
+
+line1, = axis.plot([], [], label='Real($\psi$)')
+line3, = axis.plot([], [], label='Im($\psi$)')
+line4, = axis.plot([], [], label='|$\psi^2$|')
+line2, = axis.plot([], [],label='_hidden')
 
 
 
@@ -19,18 +21,16 @@ psiI_mat = np.load('schrodinger_uwu/psiI_mat.npy')
 prob_mat = np.load('schrodinger_uwu/prob_mat.npy')
 V = np.load('schrodinger_uwu/potential.npy')
 x = np.load('schrodinger_uwu/x_coords.npy')
-
-dx = 1.0/300
-normal = sum(psiI_mat[5000][:]**2 + psiR_mat[5000][:]**2)*dx
-print(normal)
+V[V > -1000] = np.nan
+x /= np.max(x)
 
 
 
 def init():
     line1.set_data([], [])
-    line2.set_data([], [])
     line3.set_data([], [])
     line4.set_data([], [])
+    line2.set_data([], [])
     return line1, line2, line3, line4,
 
 def animate(i):
@@ -38,12 +38,15 @@ def animate(i):
     y2 = psiI_mat[i*100][:]
     y3 = prob_mat[i*100][:]
     line1.set_data(x,y1)
-    line2.set_data(x,V*1e-3)
+   
     line3.set_data(x,y2)
     line4.set_data(x,y3)
+    line2.set_data(x,V*1e-3)
     return line1, line2, line3, line4,
 
-anim = FuncAnimation(fig, animate, init_func=init, frames=2*999, interval=1, blit=True)
+anim = FuncAnimation(fig, animate, init_func=init, frames=3*999, interval=1, blit=True)
+plt.xlabel('x/L',fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 
 #writer = PillowWriter(fps=60)

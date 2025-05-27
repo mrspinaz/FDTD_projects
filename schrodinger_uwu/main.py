@@ -7,10 +7,23 @@ def gaussian_wavepacket(x, center, sigma, p0):
 
     return gaussian
 
-Nx = 301 #Number of spatial grid points
-Nt = int(2e5) #Number of temporal grid points
+def fermi(x,a,b,c,d):
+    fermi_func = (1.0*a)/(1.0*b + np.exp((x + c)/d))
+    return fermi_func
+
+def u_eye(x,width,depth,position):
+
+    f1 = fermi(x, depth, 0.1,position, 0.05)
+    f2 = fermi(x, depth, 0.1,-width + position, 0.05)
+
+    u_eye = f1-f2
+    return f1 - f2
+
+
+Nx = 401 #Number of spatial grid points
+Nt = int(3e5) #Number of temporal grid points
 hbar = 1.0
-L = 1.0 #Simulation box length 
+L = 3.0 #Simulation box length 
 m = 1.0
 k = np.pi/L
 dx = L/(Nx - 1) 
@@ -27,10 +40,10 @@ prob_mat = np.zeros([Nt,Nx])
 
 #Set up initial conditions:
 #psi0 = np.sqrt(2/L)*np.sin((np.pi/L)*x)
-gw = gaussian_wavepacket(x, center=0.5, sigma=0.1, p0=60.0) #Get gaussian envelope
+gw = gaussian_wavepacket(x, center=2.3, sigma=0.05, p0=-80.0) #Get gaussian envelope
 
-psiR0 = np.cos(60*x)*gw #Gaussian envelope 
-psiI0 = np.sin(60*x)*gw #Gaussian envelope
+psiR0 = np.cos(-80*x)*gw #Gaussian envelope 
+psiI0 = np.sin(-80*x)*gw #Gaussian envelope
 normal_init = sum(psiR0**2 + psiI0**2)*dx #normalize
 
 psiR0 /= np.sqrt(normal_init) #normalize
@@ -46,9 +59,28 @@ psiI_mat[0][:] = psiI0
 prob_mat[0][:] = psiR_mat[0][:]**2 + psiI_mat[0][:]**2
 #psiI initially should be zeros for infinite well ground state.
 
-#Define potential profile (Gaussian)
+#Define potential profile
 mu, sigma = 1.0/2.0, 1.0/20.0
 V = -1e4*np.exp(-(x-mu)**2/(2.0*sigma**2))
+
+#eyes
+left_eye = u_eye(x*1.5, width=0.5, depth=300.0, position=-0.4)
+right_eye = u_eye(x*1.5, width=0.5, depth=300.0, position=-2.4)
+
+#mouth
+left_part = u_eye(x*1.5, width=0.25, depth=300.0, position=-1.3)
+right_part = u_eye(x*1.5, width=0.25, depth=300.0, position=-1.7)
+mouth = right_part + left_part
+
+V = -1*(left_eye + right_eye + mouth + 800)
+V_scaled = V*1e-3
+V_scaled[V_scaled > 0] = np.nan
+plt.plot(x,-1*V_scaled)
+plt.xlim(0,3)
+plt.ylim(-15,20)
+plt.show()
+
+
 
 for t in range(0,Nt-1):
     
@@ -71,7 +103,6 @@ np.save('schrodinger_uwu/x_coords.npy', x)
 np.save('schrodinger_uwu/potential.npy', V)
 
 print("Calculation Completed")
-
 
 
 
