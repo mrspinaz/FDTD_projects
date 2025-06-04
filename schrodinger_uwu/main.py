@@ -20,8 +20,8 @@ def u_eye(x,width,depth,position):
     return f1 - f2
 
 
-Nx = 401 #Number of spatial grid points
-Nt = int(3e5) #Number of temporal grid points
+Nx = 501 #Number of spatial grid points
+Nt = int(2e5) #Number of temporal grid points
 hbar = 1.0
 L = 3.0 #Simulation box length 
 m = 1.0
@@ -40,10 +40,10 @@ prob_mat = np.zeros([Nt,Nx])
 
 #Set up initial conditions:
 #psi0 = np.sqrt(2/L)*np.sin((np.pi/L)*x)
-gw = gaussian_wavepacket(x, center=2.3, sigma=0.05, p0=-80.0) #Get gaussian envelope
+gw = gaussian_wavepacket(x, center=2.3, sigma=0.5, p0=-50.0) #Get gaussian envelope
 
-psiR0 = np.cos(-80*x)*gw #Gaussian envelope 
-psiI0 = np.sin(-80*x)*gw #Gaussian envelope
+psiR0 = np.cos(-50*x)*gw #Gaussian envelope 
+psiI0 = np.sin(-50*x)*gw #Gaussian envelope
 normal_init = sum(psiR0**2 + psiI0**2)*dx #normalize
 
 psiR0 /= np.sqrt(normal_init) #normalize
@@ -61,7 +61,7 @@ prob_mat[0][:] = psiR_mat[0][:]**2 + psiI_mat[0][:]**2
 
 #Define potential profile
 mu, sigma = 1.0/2.0, 1.0/20.0
-V = -1e4*np.exp(-(x-mu)**2/(2.0*sigma**2))
+V = 1e4*np.exp(-(x-mu)**2/(2.0*sigma**2))
 
 #eyes
 left_eye = u_eye(x*1.5, width=0.5, depth=300.0, position=-0.4)
@@ -72,15 +72,7 @@ left_part = u_eye(x*1.5, width=0.25, depth=300.0, position=-1.3)
 right_part = u_eye(x*1.5, width=0.25, depth=300.0, position=-1.7)
 mouth = right_part + left_part
 
-V = -1*(left_eye + right_eye + mouth + 800)
-V_scaled = V*1e-3
-V_scaled[V_scaled > 0] = np.nan
-plt.plot(x,-1*V_scaled)
-plt.xlim(0,3)
-plt.ylim(-15,20)
-plt.show()
-
-
+V = 5*(left_eye + right_eye + mouth + 800)
 
 for t in range(0,Nt-1):
     
